@@ -5,6 +5,66 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ikhtiyar</title>
     <style>
+        /* Entry Portal Page Styles */
+.portal-page {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #003cff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.5s;
+}
+
+.portal-page.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.portal-page .welcome-text {
+    color: #f7f6f1;
+    font-size: 14px;
+    margin-bottom: 0px;
+    text-align: center;
+    padding: 0 2rem;
+}
+
+.portal-page .enter-button {
+    position: relative;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.portal-page .enter-button svg {
+    width: 275px;
+    height: 100px;
+}
+
+.portal-page .enter-button .button-text {
+    position: absolute;
+    color: #f7f6f1;
+    font-size: 14px;
+    pointer-events: none;
+     transform: translate(30%,-40);
+}
+
+.portal-page .enter-button:hover svg path {
+    fill: #1d138c;
+}
+ 
+@media (max-width: 768px) {
+    .portal-page .enter-button svg {
+        width: 250px;
+    }
+}
         * {
             margin: 0;
             padding: 0;
@@ -50,7 +110,7 @@
         }
 
         nav {
-            margin-bottom: 40px;
+            margin-bottom: 0px;
         }
 
         nav a {
@@ -79,12 +139,13 @@
         }
 
         h2:first-child {
-            margin-top: 0;
+            margin-top: 5px;
         }
 
         /* Filter section */
         .filter-section {
             margin-bottom: 30px;
+            margin-top: 20px;;
             font-size: 14px;
         }
 
@@ -190,75 +251,44 @@
             font-size: 14px;
         }
 
-        /* Detail page */
-        .detail-page {
-            display: none;
+        /* Overlay Page Styles */
+        .overlay-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #fafafa;
+            z-index: 9999;
+            overflow-y: auto;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
         }
 
-        .detail-page.active {
-            display: block;
+        .overlay-page.active {
+            opacity: 1;
+            pointer-events: auto;
         }
 
-        .detail-header {
-            margin-bottom: 40px;
+        .overlay-page .close-overlay {
+            position: fixed;
+            top: 40px;
+            right: 40px;
+            cursor: pointer;
+            z-index: 10000;
         }
 
-        .detail-header h2 {
-            font-size: 20px;
-            margin-bottom: 10px;
-            text-decoration: none;
-            margin-top: 0;
+        .overlay-page .close-overlay:hover {
+        opacity: 0.6;
         }
 
-        .detail-meta {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 30px;
-        }
-
-        .detail-content {
-            margin-bottom: 40px;
-        }
-
-        .detail-media {
-            margin-bottom: 30px;
-        }
-
-        .detail-media img,
-        .detail-media video {
-            width: 100%;
-            max-width: 100%;
-            height: auto;
-            border: 1px solid #ddd;
-        }
-
-        .detail-description {
-            font-size: 14px;
-            line-height: 1.8;
-        }
-
-        .detail-description p {
-            margin-bottom: 15px;
-        }
-
-        .back-link {
-            display: inline-block;
-            margin-bottom: 30px;
-            border-bottom: 1px solid #333;
-        }
-
-        .intro {
-            margin-bottom: 40px;
-            font-size: 14px;
-        }
-
-        .contact-info {
-            font-size: 14px;
-        }
-
-        .contact-info p {
-            margin-bottom: 10px;
-        }
+@media (max-width: 768px) {
+    .overlay-page .close-overlay {
+        top: 30px;
+        right: 20px;
+    }
+}
 
         /* Waiting, Wishing, Thinking page */
         .thinking-page {
@@ -309,11 +339,25 @@
 <body>
     <div id="preview-overlay" class="preview-overlay"></div>
 
+<!-- Entry Portal Page -->
+<div class="portal-page" id="portal-page">
+    <div class="welcome-text">
+        welcome to ikhtiyar.
+    </div>
+    <div class="enter-button" onclick="enterSite()">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 421.2 142.56">
+            <path fill="#f7f6f1" d="M210.6,142.56c116.31,0,210.6-21.76,210.6-48.6s-94.29-48.6-210.6-48.6S0,67.12,0,94s94.29,48.6,210.6,48.6"/>
+        </svg>
+        <span class="button-text">make a choice</span>
+    </div>
+</div>
+
+
     <header>
         <h1 id="site-title">ikhtiyar</h1>
         <nav>
-            <a href="#system" class="nav-link active">System</a>
-            <a href="#contact" class="nav-link">Contact</a>
+            <a href="#system" class="nav-link active">system</a>
+            <a href="#contact" class="nav-link">about</a>
         </nav>
     </header>
 
@@ -321,8 +365,8 @@
         <!-- System Page (Main Landing) -->
         <div id="system" class="page active">
             <div class="intro">
-                <p>My name is Salmah and I am a designer, researcher, and storyteller.</p>
-                <p>My work explores design as a series of choices.</p>
+                <p>Hi. My name is Salmah and I am a designer, researcher, and storyteller. This is my design system, ikhtiyar.</p>
+                <p>Here, my design system focuses on choices. Click on the <u>ikhtiyar</u> above to learn more.</p>
             </div>
 
             <div class="filter-section">
@@ -331,18 +375,19 @@
                 <span class="filter-option" data-filter="Essay">Essay</span>
                 <span class="filter-option" data-filter="Photography">Photography</span>
                 <span class="filter-option" data-filter="Graphics">Graphics</span>
+                <span class="filter-option" data-filter="Exhibition">Exhibition</span>
             </div>
 
             <div class="work-list">
-                <div class="work-row" data-medium="Video, Essay">
-                    <div class="work-date">2024</div>
+                <div class="work-row" data-medium="Video, Exhibition">
+                    <div class="work-date">2025</div>
                     <div class="work-title" 
                          data-preview-type="image"
                          data-preview-src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800"
-                         data-work-id="project-one">
-                        <a href="#" class="work-link">Project Title One</a>
+                         data-work-id="Traces of Making">
+                        <a href="#" class="work-link">Traces of Making</a>
                     </div>
-                    <div class="work-medium">Video</div>
+                    <div class="work-medium">Video, Exhibition</div>
                 </div>
 
                 <div class="work-row" data-medium="Installation">
@@ -430,7 +475,7 @@
             
             <h2>Waiting, Wishing, Thinking</h2>
             
-            <p>This is a space for thoughts, observations, and reflections that don't quite fit elsewhere.</p>
+            <p>I have often found design to be something that is not quite explainable.</p>
             
             <p>You can add whatever you want here—fragments, ideas in progress, things you're mulling over.</p>
             
@@ -448,6 +493,19 @@
             </div>
         </div>
 
+        <!-- Overlay Detail Pages-->
+        <div id="work-detail-project-one" class="overlay-page">
+        <div style="max-width: 900px; margin: 0 auto; padding: 40px 20px;">
+        <a href="#" class="close-overlay">✕ Close</a>
+        
+        <div class="detail-header">
+            <h2>Project Title One</h2>
+            <div class="detail-meta">2024 · Video</div>
+        </div>
+
+        <!-- rest of your content -->
+    </div>
+</div>
         <!-- Work Detail Pages -->
         <div id="work-detail-project-one" class="detail-page">
             <a href="#system" class="back-link">← Back to System</a>
@@ -603,6 +661,11 @@
     </footer>
 
     <script>
+        // Portal entrance function
+        function enterSite() {
+        document.getElementById('portal-page').classList.add('hidden');
+            }
+
         // Click on site title to go to Waiting, Wishing, Thinking
         document.getElementById('site-title').addEventListener('click', () => {
             document.querySelectorAll('.page, .detail-page').forEach(p => p.classList.remove('active'));
