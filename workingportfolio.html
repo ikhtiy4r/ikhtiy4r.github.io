@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ikhtiyar</title>
+    <style>
+        /* Entry Portal Page Styles */
+.portal-page {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #003cff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    transition: opacity 0.5s;
+}
+
+.portal-page.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.portal-page .welcome-text {
+    color: #f7f6f1;
+    font-size: 14px;
+    margin-bottom: 0px;
+    text-align: center;
+    padding: 0 2rem;
+}
+
+.portal-page .enter-button {
+    position: relative;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.portal-page .enter-button svg {
+    width: 275px;
+    height: 100px;
+}
+
+.portal-page .enter-button .button-text {
+    position: absolute;
+    color: #f7f6f1;
+    font-size: 14px;
+    pointer-events: none;
+     transform: translate(30%,-40);
+}
+
+.portal-page .enter-button:hover svg path {
+    fill: #1d138c;
+}
+ 
+@media (max-width: 768px) {
+    .portal-page .enter-button svg {
+        width: 250px;
+    }
+}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #fafafa;
+            padding: 40px 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        a {
+            color: #333;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+
+        a:hover {
+            opacity: 0.6;
+        }
+
+        header {
+            margin-bottom: 60px;
+        }
+
+        h1 {
+            font-size: 18px;
+            font-weight: normal;
+            margin-bottom: 20px;
+            cursor: pointer;
+            display: inline-block;
+            border-bottom: 1px solid transparent;
+            transition: border-bottom 0.2s;
+        }
+
+        h1:hover {
+            border-bottom: 1px solid #333;
+        }
+
+        nav {
+            margin-bottom: 10px;
+        }
+
+        nav a {
+            margin-right: 20px;
+            border-bottom: none;
+        }
+
+        nav a.active {
+            border-bottom: 1px solid #333;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        h2 {
+            font-size: 16px;
+            font-weight: normal;
+            margin-bottom: 30px;
+            margin-top: 60px;
+            text-decoration: underline;
+        }
+
+        h2:first-child {
+            margin-top: 0;
+        }
+
+        /* Filter section */
+        .filter-section {
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .filter-section span {
+            margin-right: 20px;
+            margin-top: 10px;
+            cursor: pointer;
+            padding-bottom: 2px;
+            border-bottom: 1px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .filter-section span:hover {
+            opacity: 0.6;
+        }
+
+        .filter-section span.active {
+            border-bottom: 1px solid #333;
+        }
+
+        /* Database-style list */
+        .work-list {
+            width: 100%;
+            margin-bottom: 60px;
+        }
+
+        .work-row {
+            display: grid;
+            grid-template-columns: 100px 1fr 150px;
+            gap: 20px;
+            padding: 12px 0;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 14px;
+            position: relative;
+        }
+
+        .work-row:first-child {
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .work-row.hidden {
+            display: none;
+        }
+
+        .work-date {
+            color: #666;
+        }
+
+        .work-title {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .work-title a {
+            border-bottom: 1px solid transparent;
+        }
+
+        .work-title a:hover {
+            border-bottom: 1px solid #333;
+            opacity: 1;
+        }
+
+        .work-medium {
+            color: #666;
+            text-align: right;
+        }
+
+        /* Hover overlay */
+        .preview-overlay {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 500px;
+            max-width: 90vw;
+            height: 400px;
+            background: white;
+            border: 1px solid #333;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            display: none;
+            z-index: 1000;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .preview-overlay.active {
+            display: block;
+        }
+
+        .preview-overlay img,
+        .preview-overlay video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .preview-overlay .placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 14px;
+        }
+
+        /* Overlay Page Styles */
+        .overlay-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #fafafa;
+            z-index: 9999;
+            overflow-y: auto;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .overlay-page.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .overlay-page .close-overlay {
+            position: fixed;
+            top: 40px;
+            right: 40px;
+            cursor: pointer;
+            z-index: 10000;
+        }
+
+        .overlay-page .close-overlay:hover {
+        opacity: 0.6;
+        }
+
+@media (max-width: 768px) {
+    .overlay-page .close-overlay {
+        top: 30px;
+        right: 20px;
+    }
+}
+
+        /* Waiting, Wishing, Thinking page */
+        .thinking-page {
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .thinking-page p {
+            margin-bottom: 15px;
+        }
+
+        footer {
+            margin-top: 80px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            font-size: 13px;
+            color: #666;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 30px 15px;
+            }
+            
+            nav a {
+                display: inline-block;
+                margin-bottom: 10px;
+            }
+
+            .work-row {
+                grid-template-columns: 80px 1fr 100px;
+                gap: 10px;
+                font-size: 13px;
+            }
+
+            .preview-overlay {
+                width: 90vw;
+                height: 300px;
+            }
+
+            .filter-section span {
+                display: inline-block;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="preview-overlay" class="preview-overlay"></div>
+
+<!-- Entry Portal Page -->
+<div class="portal-page hidden" id="portal-page">
+    <div class="welcome-text">
+        welcome to ikhtiyar.
+    </div>
+    <div class="enter-button" onclick="enterSite()">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 421.2 142.56">
+            <path fill="#f7f6f1" d="M210.6,142.56c116.31,0,210.6-21.76,210.6-48.6s-94.29-48.6-210.6-48.6S0,67.12,0,94s94.29,48.6,210.6,48.6"/>
+        </svg>
+        <span class="button-text">make a choice</span>
+    </div>
+</div>
+
+
+    <header>
+        <h1 id="site-title">ikhtiyar</h1>
+        <nav>
+            <a href="#system" class="nav-link active">system</a>
+            <a href="#contact" class="nav-link">about</a>
+        </nav>
+    </header>
+
+    <main>
+        <!-- System Page (Main Landing) -->
+        <div id="system" class="page active">
+            <div class="intro">
+                <p>Hi. My name is Salmah and I am a designer, researcher, and storyteller. This is my design system, ikhtiyar.</p>
+                <p>Here, my design system focuses on choices. Click on the <u>ikhtiyar</u> above to learn more.</p>
+            </div>
+
+            <div class="filter-section">
+                <span class="filter-option active" data-filter="all">All</span>
+                <span class="filter-option" data-filter="Video">Video</span>
+                <span class="filter-option" data-filter="Essay">Essay</span>
+                <span class="filter-option" data-filter="Photography">Photography</span>
+                <span class="filter-option" data-filter="Graphics">Graphics</span>
+                <span class="filter-option" data-filter="Exhibition">Exhibition</span>
+            </div>
+
+            <div class="work-list">
+                <div class="work-row" data-medium="Video, Exhibition">
+                    <div class="work-date">2025</div>
+                    <div class="work-title" 
+                         data-preview-type="image"
+                         data-preview-src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800"
+                         data-work-id="Traces of Making">
+                        <a href="#" class="work-link">Traces of Making</a>
+                    </div>
+                    <div class="work-medium">Video, Exhibition</div>
+                </div>
+
+                <div class="work-row" data-medium="Installation">
+                    <div class="work-date">2024</div>
+                    <div class="work-title" 
+                         data-preview-type="image"
+                         data-preview-src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=800"
+                         data-work-id="project-two">
+                        <a href="#" class="work-link">Project Title Two</a>
+                    </div>
+                    <div class="work-medium">Installation</div>
+                </div>
+
+                <div class="work-row" data-medium="Essay">
+                    <div class="work-date">Nov 2024</div>
+                    <div class="work-title" 
+                         data-preview-type="image"
+                         data-preview-src="https://images.unsplash.com/photo-1455390582262-044cdead277a?w=800"
+                         data-work-id="essay-one">
+                        <a href="#" class="work-link">Essay Title One</a>
+                    </div>
+                    <div class="work-medium">Essay</div>
+                </div>
+
+                <div class="work-row" data-medium="Print">
+                    <div class="work-date">2023</div>
+                    <div class="work-title" 
+                         data-preview-type="image"
+                         data-preview-src="https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=800"
+                         data-work-id="project-three">
+                        <a href="#" class="work-link">Project Title Three</a>
+                    </div>
+                    <div class="work-medium">Print</div>
+                </div>
+
+                <div class="work-row" data-medium="Essay">
+                    <div class="work-date">Oct 2024</div>
+                    <div class="work-title" 
+                         data-preview-type="image"
+                         data-preview-src="https://images.unsplash.com/photo-1471107340929-a87cd0f5b5f3?w=800"
+                         data-work-id="essay-two">
+                        <a href="#" class="work-link">Essay Title Two</a>
+                    </div>
+                    <div class="work-medium">Essay</div>
+                </div>
+
+                <div class="work-row" data-medium="Web">
+                    <div class="work-date">2023</div>
+                    <div class="work-title" 
+                         data-preview-type="image"
+                         data-preview-src="https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?w=800"
+                         data-work-id="project-four">
+                        <a href="#" class="work-link">Another Project</a>
+                    </div>
+                    <div class="work-medium">Web</div>
+                </div>
+
+                <div class="work-row" data-medium="Essay">
+                    <div class="work-date">Sep 2024</div>
+                    <div class="work-title" 
+                         data-preview-type="image"
+                         data-preview-src="https://images.unsplash.com/photo-1432821596592-e2c18b78144f?w=800"
+                         data-work-id="essay-three">
+                        <a href="#" class="work-link">Notes on [Topic]</a>
+                    </div>
+                    <div class="work-medium">Essay</div>
+                </div>
+
+                <div class="work-row" data-medium="Photography">
+                    <div class="work-date">2022</div>
+                    <div class="work-title" 
+                         data-preview-type="image"
+                         data-preview-src="https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?w=800"
+                         data-work-id="project-five">
+                        <a href="#" class="work-link">Earlier Work</a>
+                    </div>
+                    <div class="work-medium">Photography</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Waiting, Wishing, Thinking Page -->
+        <div id="thinking" class="page thinking-page">
+            <a href="#system" class="back-link">← Back to System</a>
+            
+            <h2>Waiting, Wishing, Thinking</h2>
+            
+            <p>I have often found design to be something that is not quite explainable.</p>
+            
+            <p>You can add whatever you want here—fragments, ideas in progress, things you're mulling over.</p>
+            
+            <p>It's a place for the in-between moments, the unfinished thoughts, the things you're still figuring out.</p>
+            
+            <p>Write as much or as little as you want. This space is yours.</p>
+        </div>
+
+        <!-- Contact Page -->
+        <div id="contact" class="page">
+            <div class="contact-info">
+                <p>Email: <a href="mailto:your@email.com">your@email.com</a></p>
+                <p>Are.na: <a href="#">@yourname</a></p>
+                <p>Instagram: <a href="#">@yourname</a></p>
+            </div>
+        </div>
+
+        <!-- Overlay Detail Pages-->
+        <div id="work-detail-project-one" class="overlay-page">
+        <div style="max-width: 900px; margin: 0 auto; padding: 40px 20px;">
+        <a href="#" class="close-overlay">✕ Close</a>
+        
+        <div class="detail-header">
+            <h2>Project Title One</h2>
+            <div class="detail-meta">2024 · Video</div>
+        </div>
+
+        <!-- rest of your content -->
+    </div>
+</div>
+        <!-- Work Detail Pages -->
+        <div id="work-detail-project-one" class="detail-page">
+            <a href="#system" class="back-link">← Back to System</a>
+            
+            <div class="detail-header">
+                <h2>Project Title One</h2>
+                <div class="detail-meta">2024 · Video</div>
+            </div>
+
+            <div class="detail-content">
+                <div class="detail-media">
+                    <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200" alt="Project One">
+                    <!-- For video: <video controls><source src="your-video.mp4" type="video/mp4"></video> -->
+                </div>
+
+                <div class="detail-description">
+                    <p>This is where you describe your project in detail. What was the concept? What were you exploring? What materials or processes did you use?</p>
+                    
+                    <p>You can add multiple paragraphs, embed videos, add more images, or whatever else you need to document the work properly.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="work-detail-project-two" class="detail-page">
+            <a href="#system" class="back-link">← Back to System</a>
+            
+            <div class="detail-header">
+                <h2>Project Title Two</h2>
+                <div class="detail-meta">2024 · Installation</div>
+            </div>
+
+            <div class="detail-content">
+                <div class="detail-media">
+                    <img src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=1200" alt="Project Two">
+                </div>
+
+                <div class="detail-description">
+                    <p>Another project detail page. Each work gets its own dedicated space.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="work-detail-project-three" class="detail-page">
+            <a href="#system" class="back-link">← Back to System</a>
+            
+            <div class="detail-header">
+                <h2>Project Title Three</h2>
+                <div class="detail-meta">2023 · Print</div>
+            </div>
+
+            <div class="detail-content">
+                <div class="detail-media">
+                    <img src="https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=1200" alt="Project Three">
+                </div>
+
+                <div class="detail-description">
+                    <p>Your print work details here.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="work-detail-project-four" class="detail-page">
+            <a href="#system" class="back-link">← Back to System</a>
+            
+            <div class="detail-header">
+                <h2>Another Project</h2>
+                <div class="detail-meta">2023 · Web</div>
+            </div>
+
+            <div class="detail-content">
+                <div class="detail-media">
+                    <img src="https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?w=1200" alt="Project Four">
+                </div>
+
+                <div class="detail-description">
+                    <p>Web project details.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="work-detail-project-five" class="detail-page">
+            <a href="#system" class="back-link">← Back to System</a>
+            
+            <div class="detail-header">
+                <h2>Earlier Work</h2>
+                <div class="detail-meta">2022 · Photography</div>
+            </div>
+
+            <div class="detail-content">
+                <div class="detail-media">
+                    <img src="https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?w=1200" alt="Project Five">
+                </div>
+
+                <div class="detail-description">
+                    <p>Photography series details.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Writing Detail Pages -->
+        <div id="work-detail-essay-one" class="detail-page">
+            <a href="#system" class="back-link">← Back to System</a>
+            
+            <div class="detail-header">
+                <h2>Essay Title One</h2>
+                <div class="detail-meta">November 2024 · Essay</div>
+            </div>
+
+            <div class="detail-content">
+                <div class="detail-description">
+                    <p>Your essay text begins here. You can write as much as you need.</p>
+                    
+                    <p>Break it into paragraphs for readability.</p>
+                    
+                    <p>The simple format keeps the focus on your words.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="work-detail-essay-two" class="detail-page">
+            <a href="#system" class="back-link">← Back to System</a>
+            
+            <div class="detail-header">
+                <h2>Essay Title Two</h2>
+                <div class="detail-meta">October 2024 · Essay</div>
+            </div>
+
+            <div class="detail-content">
+                <div class="detail-description">
+                    <p>Another essay here.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="work-detail-essay-three" class="detail-page">
+            <a href="#system" class="back-link">← Back to System</a>
+            
+            <div class="detail-header">
+                <h2>Notes on [Topic]</h2>
+                <div class="detail-meta">September 2024 · Notes</div>
+            </div>
+
+            <div class="detail-content">
+                <div class="detail-description">
+                    <p>Your notes here.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2024 Your Name</p>
+    </footer>
+
+    <script>
+        // Portal entrance function
+        function enterSite() {
+        document.getElementById('portal-page').classList.add('hidden');
+            }
+
+        // Click on site title to go to Waiting, Wishing, Thinking
+        document.getElementById('site-title').addEventListener('click', () => {
+            document.querySelectorAll('.page, .detail-page').forEach(p => p.classList.remove('active'));
+            document.getElementById('thinking').classList.add('active');
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        });
+
+        // Navigation between pages
+        const navLinks = document.querySelectorAll('.nav-link');
+        const pages = document.querySelectorAll('.page');
+        const detailPages = document.querySelectorAll('.detail-page');
+        const previewOverlay = document.getElementById('preview-overlay');
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                navLinks.forEach(l => l.classList.remove('active'));
+                pages.forEach(p => p.classList.remove('active'));
+                detailPages.forEach(d => d.classList.remove('active'));
+                
+                link.classList.add('active');
+                
+                const targetId = link.getAttribute('href').substring(1);
+                document.getElementById(targetId).classList.add('active');
+            });
+        });
+
+        // Filter functionality
+        const filterOptions = document.querySelectorAll('.filter-option');
+        const workRows = document.querySelectorAll('.work-row');
+
+        filterOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                filterOptions.forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+                
+                const filter = this.dataset.filter;
+                
+                workRows.forEach(row => {
+                    if (filter === 'all') {
+                        row.classList.remove('hidden');
+                    } else {
+                        if (row.dataset.medium === filter) {
+                            row.classList.remove('hidden');
+                        } else {
+                            row.classList.add('hidden');
+                        }
+                    }
+                });
+            });
+        });
+
+        // Hover preview
+        const workTitles = document.querySelectorAll('.work-title');
+
+        workTitles.forEach(title => {
+            title.addEventListener('mouseenter', function() {
+                const previewType = this.dataset.previewType;
+                const previewSrc = this.dataset.previewSrc;
+
+                if (previewSrc) {
+                    if (previewType === 'video') {
+                        previewOverlay.innerHTML = `<video autoplay muted loop><source src="${previewSrc}" type="video/mp4"></video>`;
+                    } else {
+                        previewOverlay.innerHTML = `<img src="${previewSrc}" alt="Preview">`;
+                    }
+                } else {
+                    previewOverlay.innerHTML = '<div class="placeholder">No preview available</div>';
+                }
+
+                previewOverlay.classList.add('active');
+            });
+
+            title.addEventListener('mouseleave', function() {
+                previewOverlay.classList.remove('active');
+            });
+        });
+
+        // Click to detail page
+        const workLinks = document.querySelectorAll('.work-link');
+
+        workLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                const workId = link.parentElement.dataset.workId;
+                
+                // Hide all pages and detail pages
+                pages.forEach(p => p.classList.remove('active'));
+                detailPages.forEach(d => d.classList.remove('active'));
+                
+                // Show detail page
+                document.getElementById(`work-detail-${workId}`).classList.add('active');
+                
+                // Keep System nav active
+                navLinks.forEach(l => l.classList.remove('active'));
+                document.querySelector('a[href="#system"]').classList.add('active');
+            });
+        });
+
+        // Back links
+        const backLinks = document.querySelectorAll('.back-link');
+        
+        backLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                const href = link.getAttribute('href');
+                
+                detailPages.forEach(d => d.classList.remove('active'));
+                pages.forEach(p => p.classList.remove('active'));
+                
+                if (href === '#system') {
+                    document.getElementById('system').classList.add('active');
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    document.querySelector('a[href="#system"]').classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
